@@ -8,6 +8,7 @@ namespace Parcial2_Ap1_Kevin_Duran.DAL
         public Contexto(DbContextOptions<Contexto> Options) : base(Options) { }
         
         public DbSet<Producto> Productos { get; set; }
+        public DbSet<Entrada> Entradas { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -55,10 +56,10 @@ namespace Parcial2_Ap1_Kevin_Duran.DAL
                 new Producto
                 {
                     ProductoId = 6,
-                    Descripcion = "Caja de Pistachos",
-                    Costo = 590,
-                    Precio = 650,
-                    Existencia = 12
+                    Descripcion = "Sobre de Frutas Mixtas",
+                    Costo = 30,
+                    Precio = 60,
+                    Existencia = 0
                 }
                 ) ;
         }

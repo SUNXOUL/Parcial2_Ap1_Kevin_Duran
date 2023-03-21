@@ -17,5 +17,13 @@ namespace Parcial2_Ap1_Kevin_Duran.BLL
         {
             return _contexto.Productos.AsNoTracking().ToList();
         }
+        public Producto? Buscar(int ProductoId)
+        {
+            return _contexto.Productos.Find(ProductoId);
+        }
+        public bool Existe(int ProductoId)
+        {
+            return _contexto.Productos.Any(o => o.ProductoId == ProductoId);
+        }
     }
 }

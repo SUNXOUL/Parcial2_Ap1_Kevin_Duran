@@ -1,87 +1,259 @@
 ﻿@page "/Entrada"
 @page "/Entrada/{EntradaId:int}"
-
+@inject NotificationService NotificationService
 @inject EntradaBLL entradas
-@inject ProductoBLL Productos
+@inject ProductoBLL productos
 
-<body>
-    <div class="card">
-        <div class="card-header">
-            <h3>Registrar Productos Empacados</h3>
-        </div>
-        <div class=" card-body">
-            <div class="col-2">
-                <label for="EntradaId">ID:</label>
-                <input type="text" name="EntradaId" placeholder="ID"/>
+@try{
+<RadzenCard class="rz-shadow-7 rz-my-12 rz-mx-auto rz-p-4 rz-p-md-12">
+
+<RadzenTemplateForm TItem="Entrada" Data="@entrada" Submit="Guardar">
+<RadzenRequiredValidator Component="Concepto"  Text="Concepto es Campo requerido"   />
+    <RadzenFieldset>
+        <HeaderTemplate>
+            <span class="d-inline-flex align-items-center align-middle">
+                <RadzenIcon Icon="account_box" class="me-1" /><b>Agregar Entrada</b>
+            </span>
+        </HeaderTemplate>
+        <ChildContent>
+            
+                <div class="row">
+                    <div class="col-md-4 align-items-center d-flex">
+                        <RadzenLabel Text="ID" />
+                    </div>
+                    <div class="col-md-8" style="display:flex;">
+                        <RadzenNumeric style="width: 100%;"  @bind-Value="entrada.EntradaId" />
+                        <RadzenButton  Click="Buscar" Icon="search"  />
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-4 align-items-center d-flex">
+                        <RadzenLabel Text="Concepto" />
+                    </div>
+                    <div class="col-md-8">
+                        <RadzenTextBox style="width: 100%;" Name="Concepto" @bind-Value="entrada.Concepto" />
+                        <RadzenRequiredValidator Component="Concepto" Text="Campo requerido" Popup="true" Style="position: absolute"/>
+                    </div>
+                </div>
+
+
+                <div class="row">
+                    <div class="col-md-4 align-items-center d-flex">
+                        <RadzenLabel Text="Fecha" />
+                    </div>
+                    <div class="col-md-8">
+                        <RadzenDatePicker style="width: 100%;" Name="Fecha" DateOnly="true"  @bind-Value="entrada.Fecha" />
+                        <RadzenRequiredValidator Component="Fecha" Text="Campo requerido" Popup="true"  Style="position: absolute"/>
+                    </div>
+                </div>
+
+            <RadzenFieldset>
+        <HeaderTemplate>
+            <span class="d-inline-flex align-items-center align-middle">
+                <RadzenIcon Icon="account_box" class="me-1" /><b>Utilizadas</b>
+            </span>
+        </HeaderTemplate>
+            <ChildContent>
+            <div class="row">
+                <div class="col-md-4 align-items-center d-flex">
+                    <RadzenLabel Text="Producto" />
+                </div>
+                <div class="col-md-8">
+                    <RadzenDropDown  class="w-100" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive" FilterOperator="StringFilterOperator.StartsWith" AllowFiltering="true"
+                    Data=@productos.getList() TextProperty="Descripcion" Name="Producto" ValueProperty="ProductoId" AllowClear="true" @bind-Value=@detalle.ProductoId />
+                    <RadzenRequiredValidator Component="Producto" Text="Campo requerido" Popup="true"   Style="position: absolute"/>
+                </div>
             </div>
-            <div class="col-2">
-                <label for="Concepto">Concepto:</label>
-                <input type="text" name="Concepto" placeholder="Concepto" />
-            </div>
-            <div class="col-2">
-                <label for="Cantidad_Total">Cantidad Total:</label>
-                <input type="text" name="Cantidad_Total" placeholder="0" />
-            </div>
-            <div class="col-5">
-                <label for="">Fecha:</label>
-                <input type="text" name="Fecha" placeholder="00/00/00" />
+            <div class="row">
+                <div class="col-md-4 align-items-center d-flex">
+                    <RadzenLabel Text="Cantidad" />
+                </div>
+                <div class="col-md-8 align-items-center d-flex">
+                    <RadzenNumeric style="width: 100%;"  Name="Cantidad" @bind-Value="@detalle.Cantidad" />
+                    <RadzenRequiredValidator Component="Cantidad" Text="Campo requerido" />
+                    <RadzenButton  Click="Agregar" Icon="east"  />
+                </div>
             </div>
             <hr>
-            <h2>Utilizados</h2>
-            <div class="col-5">
-                <label for="">Producto</label>
-                <label for="cantidad">cantidad</label>
-                <input type="text" name="cantidad" placeholder="cantidad"/>
-                <button type="button" class="btn-primary" >+ADD</button>
-            </div>
-            <div class="col-5">
-                <table class="table-info">
+            <table class="table table-striped">
+                <thead>
                 <tr>
-                  <th>Producto</th>
-                  <th>Descripcion</th>
-                   <th>Cantidad</th>
+                    <th>ProductoId</th>
+                    <th>Descripcion</th>
+                    <th>Cantidad</th>
+                    <th>Funciones</th>
                 </tr>
+                </thead>
+                <tbody>
+                @foreach(var item in entrada.Detalles)
+                {
+                    <tr>
+                    <td>@item.ProductoId</td>
+                    <td>@productos.Buscar(item.ProductoId).Descripcion</td>
+                    <td>@item.Cantidad</td>
+                    <td><RadzenButton ButtonStyle="ButtonStyle.Danger" Click="()=>EliminarDetalle(item.DetalleId)" Icon="delete" /></td>
+                </tr>
+                }
 
-                    @foreach(var item in entrada.Detalles)
-                    {
-                        <tr>
-                            <td>@item.ProductoId</td>
-                            <td>@Productos.getList().Where(o=>o.ProductoId==item.ProductoId).SingleOrDefault().Descripcion</td>
-                            <td>@item.Cantidad</td>
-                        </tr>
-                            
-                    }
+                </tbody>
             </table>
 
-            <div class="col-2">
-                <label for="Producto">Producto producido:</label>
-                <input type="text" name="Producto" placeholder="0" />
-                <label for="cantidadProducida">Cantidad Producida:</label>
-                <input type="text" name="cantidadProducida" placeholder="0" />
-            </div>
+        </ChildContent>
+        </RadzenFieldset>
+        <RadzenFieldset>
+            <HeaderTemplate>
+                <span class="d-inline-flex align-items-center align-middle">
+                    <RadzenIcon Icon="account_box" class="me-1" /><b>Producto Producido</b>
+                </span>
+            </HeaderTemplate>
+            <ChildContent>
+             <div class="row">
+                <div class="col-md-4 align-items-center d-flex">
+                    <RadzenLabel Text="Producto Producido" />
+                </div>
+                <div class="col-md-8">
+                    <RadzenDropDown FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive" FilterOperator="StringFilterOperator.StartsWith" AllowFiltering="true"
+                    Data=@productos.getList().Where(o=>o.Descripcion.Contains("Sobre"))  Name="Generado" TextProperty="Descripcion" ValueProperty="ProductoId" AllowClear="true" @bind-Value=@entrada.ProductoId />
+                    <RadzenRequiredValidator Component="Generado" Text="Campo requerido" Popup="true"   Style="position: absolute"/>
+                </div>
             </div>
 
-        </div>
-        <div class="card-footer">
-            <div class="btn-group">
-            <button type="button" class="btn-primary">Nuevo</button>
-            <button type="button" class="btn-success">guardar</button>
-            <button type="button" class="btn-danger">Eliminar</button>
-            </div>
-        </div>
+                <div class="row">
+                    <div class="col-md-4 align-items-center d-flex">
+                        <RadzenLabel Text="Cantidad Total" />
+                    </div>
+                    <div class="col-md-8">
+                        <RadzenNumeric style="width: 100%;" Name="Total" @bind-Value="entrada.ProducidoTotal" />
+                        <RadzenRequiredValidator Component="Total"  Text="Campo requerido" Popup="true"   Style="position: absolute"/>
+                    </div>
+                </div>
+
+        </ChildContent>
+    </RadzenFieldset>
+
+
+        </ChildContent>
+    </RadzenFieldset>
+
+    <div style="display:flex; justify-content:center; padding:30px;">
+
+        <RadzenButton ButtonStyle="ButtonStyle.Info" Click="Nuevo" Icon="add" Text="Nuevo" />
+        <RadzenButton ButtonType="ButtonType.Submit" ButtonStyle="ButtonStyle.Success"  Icon="save" Text="Guardar" />
+        <RadzenButton ButtonStyle="ButtonStyle.Danger" Click="Eliminar" Icon="delete" Text="Eliminar" />
     </div>
-</body>
+    </RadzenTemplateForm>
+</RadzenCard>
+}
+catch (Exception e)
+{
+    <p>@e.Message</p>
+}
 
 @code {
     [Parameter]
     public int EntradaId{ get; set; }
 
     public Entrada entrada { get; set; } = new Entrada();
-    public EntradaDetalle Detalle { get; set; } = new EntradaDetalle();
+    public EntradaDetalle detalle { get; set; } = new EntradaDetalle();
 
     protected override void OnInitialized()
     {
+        if(EntradaId >0)
+        {
+            entrada.EntradaId = EntradaId;
+        }
+    }
+
+    void ShowNotification(NotificationMessage message)
+    {
+      NotificationService.Notify(message);
+    }
+
+    public void Guardar()
+    {
+        if(Validar())
+        {
+            if(entradas.Guardar(this.entrada))
+            {
+                entrada= new Entrada();
+            }
+        }
+    }
+
+    public void Nuevo()
+    {
+        entrada = new Entrada();
+        detalle = new EntradaDetalle();
+    }
+
+    public void Eliminar()
+    {
+        if(entradas.Existe(this.entrada.EntradaId))
+        {
+            entradas.Eliminar(this.entrada);
+            this.entrada=new Entrada();
+            this.detalle=new EntradaDetalle();
+        }
+    }
+
+    public void Agregar()
+    {
+        try{
+                if(productos.Existe(detalle.ProductoId) && detalle.Cantidad>0 && detalle.Cantidad<=productos.Buscar(detalle.ProductoId).Existencia)
+                {
+                    entrada.Detalles.Add(detalle);
+                    detalle= new EntradaDetalle();
+                }
+                else
+                {
+                    ShowNotification(new NotificationMessage { Severity = NotificationSeverity.Error, Summary = "Error de Registro", Detail = "Detalle Invalido", Duration = 4000, CloseOnClick = true, Payload = DateTime.Now });
+                }
+
+        }
+        catch{
+            throw;
+        }
+    }
+    public void EliminarDetalle(int DetalleId)
+    {
+        this.entrada.Detalles.Remove(entrada.Detalles.Where(o=>o.DetalleId == DetalleId).SingleOrDefault());
+    }
+
+    public void Buscar()
+    {
+        var entradaencontrada = entradas.Buscar(entrada.EntradaId);
+        if(entradaencontrada != null)
+        {
+            entrada=entradaencontrada;
+        }
+    }
+
+    public bool Validar()
+    {
+        if(this.entrada.Detalles.Count < 1)
+        {
+            ShowNotification(new NotificationMessage { Severity = NotificationSeverity.Error, Summary = "Error de Registro", Detail = "Debes tener almenos 1 detalle", Duration = 4000, CloseOnClick = true, Payload = DateTime.Now });
+            return false;
+        }
+        else if(this.entrada.ProducidoTotal<1)
+        {
+            ShowNotification(new NotificationMessage { Severity = NotificationSeverity.Error, Summary = "Error de Registro", Detail = "Debes producir almenos 1 producto", Duration = 4000, CloseOnClick = true, Payload = DateTime.Now });
+            return false;
+        }
+        else if(!productos.Existe(entrada.ProductoId))
+        {
+            ShowNotification(new NotificationMessage { Severity = NotificationSeverity.Error, Summary = "Error de Registro", Detail = "Debes elegir un producto existente para producir", Duration = 4000, CloseOnClick = true, Payload = DateTime.Now });
+            return false;
+        }
+        else{
+            ShowNotification(new NotificationMessage { Severity = NotificationSeverity.Success, Summary = "Registro Exitoso", Detail = "Entrada guardada correctamente", Duration = 4000, CloseOnClick = true, Payload = DateTime.Now });
+            return true;
+        }
 
     }
+
+    
+
 
 }

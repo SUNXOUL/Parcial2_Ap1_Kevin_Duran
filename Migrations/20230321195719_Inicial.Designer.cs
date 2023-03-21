@@ -11,14 +11,14 @@ using Parcial2_Ap1_Kevin_Duran.DAL;
 namespace Parcial2_Ap1_Kevin_Duran.Migrations
 {
     [DbContext(typeof(Contexto))]
-    [Migration("20230320233259_Entradas")]
-    partial class Entradas
+    [Migration("20230321195719_Inicial")]
+    partial class Inicial
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
-            modelBuilder.HasAnnotation("ProductVersion", "8.0.0-preview.2.23128.3");
+            modelBuilder.HasAnnotation("ProductVersion", "7.0.4");
 
             modelBuilder.Entity("Parcial2_Ap1_Kevin_Duran.Models.Entrada", b =>
                 {
@@ -32,7 +32,7 @@ namespace Parcial2_Ap1_Kevin_Duran.Migrations
                     b.Property<string>("Concepto")
                         .HasColumnType("TEXT");
 
-                    b.Property<DateOnly>("Fecha")
+                    b.Property<DateTime>("Fecha")
                         .HasColumnType("TEXT");
 
                     b.Property<int>("ProducidoTotal")
@@ -44,6 +44,28 @@ namespace Parcial2_Ap1_Kevin_Duran.Migrations
                     b.HasKey("EntradaId");
 
                     b.ToTable("Entradas");
+                });
+
+            modelBuilder.Entity("Parcial2_Ap1_Kevin_Duran.Models.EntradaDetalle", b =>
+                {
+                    b.Property<int>("DetalleId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("Cantidad")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("EntradaId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("ProductoId")
+                        .HasColumnType("INTEGER");
+
+                    b.HasKey("DetalleId");
+
+                    b.HasIndex("EntradaId");
+
+                    b.ToTable("EntradaDetalle");
                 });
 
             modelBuilder.Entity("Parcial2_Ap1_Kevin_Duran.Models.Producto", b =>
@@ -118,6 +140,20 @@ namespace Parcial2_Ap1_Kevin_Duran.Migrations
                             Existencia = 0,
                             Precio = 60.0
                         });
+                });
+
+            modelBuilder.Entity("Parcial2_Ap1_Kevin_Duran.Models.EntradaDetalle", b =>
+                {
+                    b.HasOne("Parcial2_Ap1_Kevin_Duran.Models.Entrada", null)
+                        .WithMany("Detalles")
+                        .HasForeignKey("EntradaId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("Parcial2_Ap1_Kevin_Duran.Models.Entrada", b =>
+                {
+                    b.Navigation("Detalles");
                 });
 #pragma warning restore 612, 618
         }

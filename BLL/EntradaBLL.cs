@@ -14,14 +14,14 @@ namespace Parcial2_Ap1_Kevin_Duran.BLL
 
         public bool Existe(int EntradaId)
         {
-            return _contexto.Entradas.Any(o=>o.EntradaId == EntradaId);
+            return _contexto.Entradas.Any(o => o.EntradaId == EntradaId);
         }
 
         public bool Guardar(Entrada entrada)
         {
             try
             {
-                if(Existe(entrada.EntradaId))
+                if (Existe(entrada.EntradaId))
                 {
                     return Modificar(entrada);
                 }
@@ -40,7 +40,8 @@ namespace Parcial2_Ap1_Kevin_Duran.BLL
         {
             try
             {
-                bool cambios;
+                var producido = _contexto.Productos.Find(entrada.ProductoId);
+                bool cambios = false;
 
                 if (entrada != null)
                 {
@@ -48,24 +49,27 @@ namespace Parcial2_Ap1_Kevin_Duran.BLL
                     foreach (var item in entrada.Detalles)
                     {
                         var producto = _contexto.Productos.Find(item.ProductoId);
-                        if(producto != null)
+                        if (producto != null)
                         {
                             producto.Existencia -= item.Cantidad;
                             _contexto.Update(producto);
-                            _contexto.SaveChanges();
-                            _contexto.Entry(producto).State = EntityState.Detached;
                         }
                     }
 
-                    //calculamos la cantidad utilizada
-                    var cantidades = from detalle in entrada.Detalles select detalle.Cantidad;
-                    entrada.Cantidad = cantidades.Sum();
+                    //aumentamos el stock del producido
+                    if (producido != null)
+                    {
+                        producido.Existencia += entrada.ProducidoTotal;
+                        _contexto.Update(producido);
+                    }
+
+
 
                     //Insertamos La entrada
-                   
-                    _contexto.Add(entrada);
+                    _contexto.Entradas.Add(entrada);
+                    cambios = _contexto.SaveChanges() > 0;
                     _contexto.Entry(entrada).State = EntityState.Detached;
-                    cambios= _contexto.SaveChanges() > 0;
+
                     return cambios;
                 }
                 else
@@ -82,11 +86,12 @@ namespace Parcial2_Ap1_Kevin_Duran.BLL
         {
             try
             {
+                var producido = _contexto.Productos.Find(entrada.ProductoId);
                 bool cambios;
-                var anterior = _contexto.Entradas.Where(o=>o.EntradaId==entrada.EntradaId).Include(o=>o.Detalles).AsNoTracking().SingleOrDefault();
+                var anterior = _contexto.Entradas.Where(o => o.EntradaId == entrada.EntradaId).Include(o => o.Detalles).AsNoTracking().SingleOrDefault();
 
                 //Eliminamos los detalles anteriores del inventario
-                if(anterior != null)
+                if (anterior != null)
                 {
                     foreach (var item in anterior.Detalles)
                     {
@@ -99,29 +104,35 @@ namespace Parcial2_Ap1_Kevin_Duran.BLL
                             _contexto.Entry(producto).State = EntityState.Detached;
                         }
                     }
+
+                    //eliminamos el stock anterior y lo actualizamos
+                    if (producido != null)
+                    {
+                        producido.Existencia -= anterior.ProducidoTotal;
+                        producido.Existencia += entrada.ProducidoTotal;
+                        _contexto.Update(producido);
+                    }
                 }
 
                 //eliminamos de la base de datos
-                _contexto.Database.ExecuteSqlRaw($"DELETE FROM EntradasDetalles where EntradaId = {entrada.EntradaId}");
-
+                _contexto.Database.ExecuteSqlRaw($"DELETE FROM EntradaDetalle where EntradaId = {entrada.EntradaId}");
 
                 //agregamos los nuevos Detalles 
                 foreach (var item in entrada.Detalles)
                 {
-                    _contexto.Entry(item).State = EntityState.Added; 
+                    _contexto.Entry(item).State = EntityState.Added;
 
                     var producto = _contexto.Productos.Find(item.ProductoId);
                     if (producto != null)
                     {
                         producto.Existencia -= item.Cantidad;
-                        _contexto.Update(producto);
-                        _contexto.SaveChanges();
-                        _contexto.Entry(producto).State = EntityState.Detached;
+                        _contexto.Productos.Update(producto);
                     }
+
                 }
 
                 //Modificamos la entrada
-                _contexto.Update(entrada);
+                _contexto.Entradas.Update(entrada);
                 cambios = _contexto.SaveChanges() > 0;
                 _contexto.Entry(entrada).State = EntityState.Detached;
                 return cambios;
@@ -136,7 +147,8 @@ namespace Parcial2_Ap1_Kevin_Duran.BLL
         {
             try
             {
-                if(entrada != null)
+                var producido = _contexto.Productos.Find(entrada.ProductoId);
+                if (entrada != null)
                 {
                     bool cambios;
 
@@ -149,11 +161,13 @@ namespace Parcial2_Ap1_Kevin_Duran.BLL
                             if (producto != null)
                             {
                                 producto.Existencia += item.Cantidad;
-                                _contexto.Update(producto);
-                                _contexto.SaveChanges();
-                                _contexto.Entry(producto).State = EntityState.Detached;
+                                _contexto.Productos.Update(producto);
                             }
                         }
+
+                        //eliminamos el stock del producido
+                        producido.Existencia -= entrada.ProducidoTotal;
+                        _contexto.Update(producido);
                     }
 
 
@@ -164,10 +178,10 @@ namespace Parcial2_Ap1_Kevin_Duran.BLL
                     return cambios;
                 }
                 else
-                { 
+                {
                     return false;
                 }
-        
+
             }
             catch
             {
@@ -177,7 +191,7 @@ namespace Parcial2_Ap1_Kevin_Duran.BLL
 
         public Entrada? Buscar(int EntradaId)
         {
-            return _contexto.Entradas.Where(o=>o.EntradaId == EntradaId).AsNoTracking().FirstOrDefault();
+            return _contexto.Entradas.Where(o => o.EntradaId == EntradaId).Include(o => o.Detalles).AsNoTracking().FirstOrDefault();
         }
 
         public List<Entrada> getList()

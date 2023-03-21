@@ -1,0 +1,33 @@
+@page "/Entradas"
+
+@inject EntradaBLL entradas
+
+        <HeaderTemplate>
+            <span class="d-inline-flex align-items-center align-middle">
+                <RadzenIcon Icon="account_box" class="me-1" /><b>Consultar Entradas</b>
+            </span>
+        </HeaderTemplate>
+@try{
+
+    <RadzenCard class="rz-shadow-7 rz-my-12 rz-mx-auto rz-p-4 rz-p-md-12">
+
+        <ChildContent>
+
+            <RadzenDataGrid AllowFiltering="true" AllowColumnResize="true" AllowAlternatingRows="false" FilterMode="FilterMode.Advanced" AllowSorting="true" PageSize="10" AllowPaging="true" PagerHorizontalAlign="HorizontalAlign.Left" ShowPagingSummary="true"
+                        Data="@entradas.getList()" TItem="Entrada" ColumnWidth="300px" LogicalFilterOperator="LogicalFilterOperator.Or">
+
+                <Columns>
+                    <RadzenDataGridColumn TItem="Entrada" Property="EntradaId" Title="EntradaId" />
+                    <RadzenDataGridColumn TItem="Entrada" Property="Fecha" Title="Fecha" />
+                    <RadzenDataGridColumn TItem="Entrada" Property="Concepto" Title="Concepto" />
+                    <RadzenDataGridColumn TItem="Entrada" Property="ProductoId" Title="ProductoId" />
+                    <RadzenDataGridColumn TItem="Entrada" Property="ProducidoTotal" Title="Total Producido" />
+                </Columns>
+            </RadzenDataGrid>
+        </ChildContent>
+    </RadzenCard>
+}
+catch (Exception e)
+{
+    <p>@e.Message</p>
+}

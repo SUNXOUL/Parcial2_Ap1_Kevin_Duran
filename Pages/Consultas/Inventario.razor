@@ -1,0 +1,36 @@
+@page "/Productos"
+
+@inject ProductoBLL productos
+
+        <HeaderTemplate>
+            <span class="d-inline-flex align-items-center align-middle">
+                <RadzenIcon Icon="account_box" class="me-1" /><b>Consultar Productos</b>
+            </span>
+        </HeaderTemplate>
+@try{
+
+    <RadzenCard class="rz-shadow-7 rz-my-12 rz-mx-auto rz-p-4 rz-p-md-12">
+
+        <ChildContent>
+
+            <RadzenDataGrid AllowFiltering="true" AllowColumnResize="true" AllowAlternatingRows="false" FilterMode="FilterMode.Advanced" AllowSorting="true" PageSize="10" AllowPaging="true" PagerHorizontalAlign="HorizontalAlign.Left" ShowPagingSummary="true"
+                        Data="@productos.getList()" TItem="Producto" ColumnWidth="300px" LogicalFilterOperator="LogicalFilterOperator.Or">
+
+                <Columns>
+                    <RadzenDataGridColumn TItem="Producto" Property="ProductoId" Title="ProductoId" />
+                    <RadzenDataGridColumn TItem="Producto" Property="Descripcion" Title="Descripcion" />
+                    <RadzenDataGridColumn TItem="Producto" Property="Precio" Title="Precio" />
+                    <RadzenDataGridColumn TItem="Producto" Property="Costo" Title="Costo" />
+                    <RadzenDataGridColumn TItem="Producto" Property="Existencia" Title="Existencia" />
+                </Columns>
+            </RadzenDataGrid>
+        </ChildContent>
+    </RadzenCard>
+}
+catch (Exception e)
+{
+    <p>@e.Message</p>
+}
+@code{
+
+}

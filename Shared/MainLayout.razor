@@ -1,19 +1,37 @@
-﻿@inherits LayoutComponentBase
+@inherits LayoutComponentBase
 
-<PageTitle>Parcial2_Ap1_Kevin_Duran</PageTitle>
-
-<div class="page">
-    <div class="sidebar">
-        <NavMenu />
-    </div>
-
-    <main>
-        <div class="top-row px-4">
-            <a href="https://docs.microsoft.com/aspnet/" target="_blank">About</a>
+<PageTitle>2do Parcial</PageTitle>
+<RadzenNotification />
+<RadzenLayout Style="height: 100vh; grid-template-columns: auto 1fr auto; grid-template-areas: 'rz-header rz-header rz-header' 'rz-sidebar rz-body rz-right-sidebar'">
+    <RadzenHeader>
+        <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0">
+            <RadzenSidebarToggle Click="@(() => sidebar5Expanded = !sidebar5Expanded)" />
+            <RadzenLabel Text="SEGUNDO PARCIAL KEVIN DURAN" />
+        </RadzenStack>
+    </RadzenHeader>
+    <RadzenSidebar @bind-Expanded="@sidebar5Expanded">
+        <RadzenPanelMenu>
+            <RadzenPanelMenuItem Text="Inicio" Path="/" Icon="home" />
+            <RadzenPanelMenuItem Text="Registrar Entrada" Path="/Entrada" Icon="note_add" />
+            <RadzenPanelMenuItem Text="Consulta Entradas" Path="/Entradas" Icon="search" />
+            <RadzenPanelMenuItem Text="Consulta Inventario" Path="/Productos" Icon="search" />
+        </RadzenPanelMenu>
+        <div class="rz-p-4">
         </div>
-
-        <article class="content px-4">
+    </RadzenSidebar>
+    <RadzenBody>
+        <div class="rz-p-4">
             @Body
-        </article>
-    </main>
-</div>
+        </div>
+    </RadzenBody>
+    <RadzenSidebar @bind-Expanded="@sidebar6Expanded" Style="width: 300px; grid-area: rz-right-sidebar">
+        <div class="rz-p-4">
+
+        </div>
+    </RadzenSidebar>
+</RadzenLayout>
+
+@code {
+    bool sidebar5Expanded = true;
+    bool sidebar6Expanded = true;
+}

@@ -1,8 +1,13 @@
+using System.Collections.Generic;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.EntityFrameworkCore;
 using Parcial2_Ap1_Kevin_Duran.BLL;
 using Parcial2_Ap1_Kevin_Duran.DAL;
+using Radzen;
+
+
+
 
 var builder = WebApplication.CreateBuilder(args);
 var ConStr = builder.Configuration.GetConnectionString("ConStr");
@@ -13,6 +18,8 @@ builder.Services.AddServerSideBlazor();
 
 builder.Services.AddScoped<EntradaBLL>();
 builder.Services.AddScoped<ProductoBLL>();
+builder.Services.AddScoped<NotificationService>();
+
 
 var app = builder.Build();
 

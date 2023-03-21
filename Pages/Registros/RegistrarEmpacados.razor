@@ -1,0 +1,87 @@
+﻿@page "/Entrada"
+@page "/Entrada/{EntradaId:int}"
+
+@inject EntradaBLL entradas
+@inject ProductoBLL Productos
+
+<body>
+    <div class="card">
+        <div class="card-header">
+            <h3>Registrar Productos Empacados</h3>
+        </div>
+        <div class=" card-body">
+            <div class="col-2">
+                <label for="EntradaId">ID:</label>
+                <input type="text" name="EntradaId" placeholder="ID"/>
+            </div>
+            <div class="col-2">
+                <label for="Concepto">Concepto:</label>
+                <input type="text" name="Concepto" placeholder="Concepto" />
+            </div>
+            <div class="col-2">
+                <label for="Cantidad_Total">Cantidad Total:</label>
+                <input type="text" name="Cantidad_Total" placeholder="0" />
+            </div>
+            <div class="col-5">
+                <label for="">Fecha:</label>
+                <input type="text" name="Fecha" placeholder="00/00/00" />
+            </div>
+            <hr>
+            <h2>Utilizados</h2>
+            <div class="col-5">
+                <label for="">Producto</label>
+                <label for="cantidad">cantidad</label>
+                <input type="text" name="cantidad" placeholder="cantidad"/>
+                <button type="button" class="btn-primary" >+ADD</button>
+            </div>
+            <div class="col-5">
+                <table class="table-info">
+                <tr>
+                  <th>Producto</th>
+                  <th>Descripcion</th>
+                   <th>Cantidad</th>
+                </tr>
+
+                    @foreach(var item in entrada.Detalles)
+                    {
+                        <tr>
+                            <td>@item.ProductoId</td>
+                            <td>@Productos.getList().Where(o=>o.ProductoId==item.ProductoId).SingleOrDefault().Descripcion</td>
+                            <td>@item.Cantidad</td>
+                        </tr>
+                            
+                    }
+            </table>
+
+            <div class="col-2">
+                <label for="Producto">Producto producido:</label>
+                <input type="text" name="Producto" placeholder="0" />
+                <label for="cantidadProducida">Cantidad Producida:</label>
+                <input type="text" name="cantidadProducida" placeholder="0" />
+            </div>
+            </div>
+
+        </div>
+        <div class="card-footer">
+            <div class="btn-group">
+            <button type="button" class="btn-primary">Nuevo</button>
+            <button type="button" class="btn-success">guardar</button>
+            <button type="button" class="btn-danger">Eliminar</button>
+            </div>
+        </div>
+    </div>
+</body>
+
+@code {
+    [Parameter]
+    public int EntradaId{ get; set; }
+
+    public Entrada entrada { get; set; } = new Entrada();
+    public EntradaDetalle Detalle { get; set; } = new EntradaDetalle();
+
+    protected override void OnInitialized()
+    {
+
+    }
+
+}

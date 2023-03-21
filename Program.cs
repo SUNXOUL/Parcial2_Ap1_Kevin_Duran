@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.EntityFrameworkCore;
+using Parcial2_Ap1_Kevin_Duran.BLL;
 using Parcial2_Ap1_Kevin_Duran.DAL;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -9,6 +10,9 @@ builder.Services.AddDbContext<Contexto>(Options => Options.UseSqlite(ConStr));
 // Add services to the container.
 builder.Services.AddRazorPages();
 builder.Services.AddServerSideBlazor();
+
+builder.Services.AddScoped<EntradaBLL>();
+builder.Services.AddScoped<ProductoBLL>();
 
 var app = builder.Build();
 
